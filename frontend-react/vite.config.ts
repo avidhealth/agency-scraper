@@ -8,6 +8,7 @@ const srcPath = path.resolve(__dirname, "src")
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/', // Use root-relative paths for assets
   plugins: [react()],
   resolve: {
     alias: {

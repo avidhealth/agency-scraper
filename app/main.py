@@ -61,17 +61,22 @@ app.add_middleware(
 
 # Mount static files directory and serve index.html at root
 # Try React frontend first, fall back to vanilla JS frontend
-frontend_react_path = Path(__file__).parent.parent / "frontend-react" / "dist"
+# In Docker, frontend is copied to ./frontend/ (see Dockerfile line 78)
+frontend_react_path = Path(__file__).parent.parent / "frontend"
 frontend_path = Path(__file__).parent.parent / "frontend"
 
 # Serve React frontend if built, otherwise serve vanilla JS frontend
 if frontend_react_path.exists() and (frontend_react_path / "index.html").exists():
-    # Serve React frontend
+    # Serve React frontend static assets
+    # Mount assets directory for Vite-built JS/CSS files
+    if (frontend_react_path / "assets").exists():
+        app.mount("/assets", StaticFiles(directory=str(frontend_react_path / "assets")), name="assets")
+    # Mount root for other static files (favicons, etc.)
     app.mount("/static", StaticFiles(directory=str(frontend_react_path)), name="static")
-    app.mount("/assets", StaticFiles(directory=str(frontend_react_path / "assets")), name="assets")
     
     @app.get("/app")
-    async def serve_frontend():
+    @app.get("/app/{path:path}")  # Catch-all for React Router
+    async def serve_frontend(path: str = ""):
         """Serve the React frontend application."""
         from fastapi.responses import FileResponse
         index_path = frontend_react_path / "index.html"
@@ -97,7 +102,7 @@ async def root():
     """Root endpoint - redirects to frontend or shows API info."""
     from fastapi.responses import RedirectResponse
     # Check for React frontend first
-    frontend_react_index = Path(__file__).parent.parent / "frontend-react" / "dist" / "index.html"
+    frontend_react_index = Path(__file__).parent.parent / "frontend" / "index.html"
     frontend_index = frontend_path / "index.html"
     if frontend_react_index.exists() or frontend_index.exists():
         return RedirectResponse(url="/app")
