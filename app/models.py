@@ -47,3 +47,9 @@ class BatchScrapeResult(BaseModel):
     error: Optional[str] = None
 
 
+class CreateListRequest(BaseModel):
+    """Request model for creating a list."""
+    name: str
+    description: Optional[str] = None
+
+
