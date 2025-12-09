@@ -10,16 +10,31 @@ RUN npm run build
 # Stage 2: Python backend with built frontend
 FROM python:3.12-slim
 
-# Install system dependencies
+# Install system dependencies and Playwright browser dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
+    fonts-unifont \
+    fonts-liberation \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libatspi2.0-0 \
+    libxshmfence1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Playwright browsers (required for scraping)
 RUN pip install playwright==1.40.0 && \
-    playwright install chromium && \
-    playwright install-deps chromium
+    playwright install chromium
 
 # Reduce image size by cleaning up apt cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
