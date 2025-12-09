@@ -1,6 +1,6 @@
 # Multi-stage build for single container deployment
-# Stage 1: Build React frontend
-FROM node:18-alpine AS frontend-builder
+# Stage 1: Build React frontend (Vite 7 requires Node 20+)
+FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend-react
 COPY frontend-react/package*.json ./
 RUN npm ci
