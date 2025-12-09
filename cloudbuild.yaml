@@ -33,7 +33,7 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'  # Remove if you want authenticated access
       - '--port'
-      - '8000'
+      - '8080'  # Cloud Run default port (container reads PORT env var)
       - '--memory'
       - '2Gi'  # Adjust based on your needs
       - '--cpu'
