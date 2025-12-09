@@ -2,9 +2,23 @@
 # Stage 1: Build React frontend (Vite 7 requires Node 20+)
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend-react
+
+# Copy package files first for better caching
 COPY frontend-react/package*.json ./
 RUN npm ci
+
+# Copy all frontend source files
+# Note: Using COPY with trailing slash copies contents, not the directory itself
 COPY frontend-react/ ./
+
+# Debug: Verify critical files exist before build
+RUN echo "=== Checking file structure ===" && \
+    ls -la /app/frontend-react/ | head -20 && \
+    echo "=== Checking src/lib ===" && \
+    ls -la /app/frontend-react/src/lib/ && \
+    test -f /app/frontend-react/src/lib/api.ts && echo "✓ api.ts found" || echo "✗ api.ts NOT FOUND" && \
+    test -f /app/frontend-react/src/lib/utils.ts && echo "✓ utils.ts found" || echo "✗ utils.ts NOT FOUND"
+
 RUN npm run build
 
 # Stage 2: Python backend with built frontend
