@@ -7,13 +7,22 @@ WORKDIR /app/frontend-react
 COPY frontend-react/package*.json ./
 RUN npm ci
 
-# Copy all frontend source files
-# Note: Using COPY with trailing slash copies contents, not the directory itself
-COPY frontend-react/ ./
+# Copy all frontend source files explicitly to ensure everything is included
+COPY frontend-react/src ./src
+COPY frontend-react/public ./public
+COPY frontend-react/index.html ./
+COPY frontend-react/vite.config.ts ./
+COPY frontend-react/tsconfig*.json ./
+COPY frontend-react/tailwind.config.js ./
+COPY frontend-react/postcss.config.js ./
+COPY frontend-react/eslint.config.js ./
+COPY frontend-react/components.json ./
 
 # Debug: Verify critical files exist before build
 RUN echo "=== Checking file structure ===" && \
     ls -la /app/frontend-react/ | head -20 && \
+    echo "=== Checking src directory ===" && \
+    ls -la /app/frontend-react/src/ && \
     echo "=== Checking src/lib ===" && \
     ls -la /app/frontend-react/src/lib/ && \
     test -f /app/frontend-react/src/lib/api.ts && echo "✓ api.ts found" || echo "✗ api.ts NOT FOUND" && \
